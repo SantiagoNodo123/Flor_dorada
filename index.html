@@ -1,149 +1,463 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flor Dorada | Demo 2026</title>
+    <title>Flor Dorada | Rituales Botánicos</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fcfbf9',
+                            100: '#f4f1eb',
+                            200: '#eae4d3',
+                            500: '#d4af37', // Gold
+                            800: '#5c715e', // Green
+                            900: '#2c2a29', // Dark
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
-        /* --- VARIABLES & RESET --- */
-        :root {
-            --bg-color: #fcfbf9;
-            --text-main: #2c2a29;
-            --accent-green: #5c715e;
-            --accent-gold: #d4af37;
-            --surface: #ffffff;
+        body {
+            background-color: #fcfbf9;
+            color: #2c2a29;
+            overflow-x: hidden;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; scroll-behavior: smooth; }
-
-        /* --- ANIMACIONES CSS (Efecto Scroll) --- */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 1s ease forwards;
-        }
-        .delay-1 { animation-delay: 0.3s; }
-        .delay-2 { animation-delay: 0.6s; }
-
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- HERO SECTION --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: linear-gradient(to bottom, #eae4d3, var(--bg-color));
-            padding: 20px;
-        }
-        .hero h1 { font-size: 3.5rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 15px; }
-        .hero p { font-size: 1.2rem; color: #666; margin-bottom: 40px; max-width: 600px; }
-        .btn {
-            background-color: var(--accent-green); color: white; padding: 15px 35px; border: none; border-radius: 30px; font-size: 1rem; cursor: pointer; transition: 0.3s;
-        }
-        .btn:hover { background-color: #4a5c4b; transform: scale(1.05); }
-
-        /* --- ORACULO IA (Chat Flotante) --- */
-        .oracle-btn {
-            position: fixed; bottom: 30px; right: 30px; background: var(--accent-gold); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); z-index: 100; transition: 0.3s;
-        }
-        .oracle-btn:hover { transform: scale(1.1); }
-
-        .chat-window {
-            position: fixed; bottom: 100px; right: 30px; width: 350px; background: var(--surface); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 20px; display: none; z-index: 100; opacity: 0; transform: translateY(20px); transition: all 0.4s ease;
-        }
-        .chat-window.active { display: block; opacity: 1; transform: translateY(0); }
-        .chat-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; color: var(--accent-green); }
         
-        .chat-msg { margin-bottom: 15px; font-size: 0.95rem; }
-        .msg-ai { background: #f0f4f1; padding: 12px; border-radius: 0 15px 15px 15px; }
-        
-        .chat-options { display: flex; gap: 10px; flex-wrap: wrap; }
-        .opt-btn { background: white; border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-        .opt-btn:hover { background: var(--accent-green); color: white; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
 
-        /* --- PRODUCTO RECOMENDADO & CHECKOUT ZERO FRICTION --- */
-        .product-card { display: none; margin-top: 15px; border: 1px solid #eee; border-radius: 10px; padding: 15px; text-align: center; }
-        .product-card img { width: 100px; height: 100px; background: #eae4d3; border-radius: 50%; margin-bottom: 10px; object-fit: cover;}
+        .product-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         
-        .checkout-btn { width: 100%; background: #111; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .checkout-btn:hover { background: #333; }
-        .wompi-badge { font-size: 0.7rem; color: #888; margin-top: 5px; display: block; }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -10px rgba(92, 113, 94, 0.15);
+        }
 
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(135deg, #5c715e 0%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
-<body>
+<body class="antialiased selection:bg-brand-500 selection:text-white">
 
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <h1 class="fade-in">Flor Dorada</h1>
-        <p class="fade-in delay-1">Rituales botanicos para tu cuerpo y tu santuario. Descubre lo que la naturaleza tiene para ti hoy.</p>
-        <button class="btn fade-in delay-2" onclick="openOracle()">Descubrir Mi Rutina</button>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b border-white/20 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="#" class="font-display font-medium text-2xl tracking-wide text-brand-900">
+                        Flor Dorada<span class="text-brand-500">.</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#filosofia" class="text-brand-900/70 hover:text-brand-800 transition-colors px-3 py-2 text-sm font-medium">Filosofía</a>
+                        <a href="#productos" class="text-brand-900/70 hover:text-brand-800 transition-colors px-3 py-2 text-sm font-medium">Colección</a>
+                        <a href="#oraculo" class="text-brand-900/70 hover:text-brand-800 transition-colors px-3 py-2 text-sm font-medium">Oráculo IA</a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button class="p-2 text-brand-900/70 hover:text-brand-800 transition-colors">
+                        <i class="ph ph-magnifying-glass text-xl"></i>
+                    </button>
+                    <button class="p-2 text-brand-900/70 hover:text-brand-800 transition-colors">
+                        <i class="ph ph-shopping-bag text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <!-- Decorative background elements -->
+            <div class="absolute top-0 -left-40 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob"></div>
+            <div class="absolute top-0 -right-40 w-96 h-96 bg-brand-100 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-2000"></div>
+            <div class="absolute -bottom-40 left-20 w-96 h-96 bg-brand-200/50 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-blob animation-delay-4000"></div>
+        </div>
+        
+        <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 text-center">
+            <span class="gsap-hero inline-block py-1 px-3 rounded-full bg-brand-800/10 text-brand-800 text-sm font-medium tracking-wide mb-6">
+                Bienestar Botánico
+            </span>
+            <h1 class="gsap-hero font-display text-5xl md:text-7xl lg:text-8xl font-light tracking-tight text-brand-900 mb-8 leading-tight">
+                Eleva tu ritual <br/>
+                <span class="text-gradient font-medium italic">de cada día.</span>
+            </h1>
+            <p class="gsap-hero mt-4 text-lg md:text-xl text-brand-900/60 max-w-2xl mx-auto mb-10 font-light">
+                Descubre el poder de la naturaleza concentrado en fórmulas magistrales para armonizar tu cuerpo y tu espacio sagrado.
+            </p>
+            <div class="gsap-hero flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#productos" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-white bg-brand-800 hover:bg-brand-900 hover:shadow-lg hover:shadow-brand-800/30 transition-all duration-300">
+                    Explorar Colección
+                </a>
+                <button onclick="document.getElementById('oraculo-section').scrollIntoView()" class="inline-flex items-center justify-center px-8 py-4 border border-brand-800/20 text-base font-medium rounded-full text-brand-800 bg-white hover:bg-brand-50 hover:border-brand-800/50 transition-all duration-300">
+                    <i class="ph ph-sparkle mr-2"></i> Consultar Oráculo
+                </button>
+            </div>
+        </div>
     </section>
 
-    <!-- ORACLE BUTTON -->
-    <div class="oracle-btn" onclick="toggleOracle()">&#10024;</div>
+    <!-- Filosofía Section -->
+    <section id="filosofia" class="py-24 bg-white relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="gsap-fade-right">
+                    <h2 class="font-display text-4xl md:text-5xl font-light text-brand-900 mb-6">La pureza de lo <span class="italic text-brand-500">esencial</span>.</h2>
+                    <p class="text-brand-900/70 text-lg mb-6 leading-relaxed font-light">
+                        En Flor Dorada creemos que el cuidado personal no es una obligación, sino un ritual sagrado. Cada gota de nuestros productos contiene extractos botánicos seleccionados por sus propiedades vibracionales y terapéuticas.
+                    </p>
+                    <p class="text-brand-900/70 text-lg leading-relaxed font-light">
+                        Sin artificios. Sin prisa. Solo la inteligencia de la naturaleza aplicada a tu bienestar diario.
+                    </p>
+                    <div class="mt-8 flex gap-6">
+                        <div class="flex flex-col gap-2">
+                            <i class="ph ph-leaf text-3xl text-brand-800"></i>
+                            <span class="text-sm font-medium">100% Natural</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <i class="ph ph-drop text-3xl text-brand-800"></i>
+                            <span class="text-sm font-medium">Prensado en Frío</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <i class="ph ph-hand-heart text-3xl text-brand-800"></i>
+                            <span class="text-sm font-medium">Hecho a Mano</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="gsap-fade-left relative h-[500px] w-full bg-brand-100 rounded-3xl overflow-hidden flex items-center justify-center border border-brand-200/50">
+                    <!-- Placeholder visual elegante en lugar de imagen -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-brand-100 to-brand-200 opacity-50"></div>
+                    <i class="ph ph-flower-lotus text-9xl text-brand-800/20"></i>
+                    <div class="absolute bottom-8 right-8 glass-panel px-6 py-4 rounded-2xl">
+                        <p class="font-display text-lg text-brand-900">Armonía botánica</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- ORACLE CHAT WINDOW -->
-    <div class="chat-window" id="oracleChat">
-        <div class="chat-header">Oraculo de Bienestar IA</div>
+    <!-- Productos Section (Sin imágenes, diseño limpio) -->
+    <section id="productos" class="py-32 bg-brand-50 relative">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-20 gsap-fade-up">
+                <h2 class="font-display text-4xl md:text-5xl font-light text-brand-900 mb-6">Nuestra <span class="italic text-brand-800">Colección</span></h2>
+                <p class="text-lg text-brand-900/60 font-light">Fórmulas minimalistas para el cuerpo y el alma. Elige el ritual que necesitas hoy.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Producto 1 -->
+                <div class="gsap-product product-card bg-white rounded-3xl p-8 border border-brand-200/30 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button class="w-10 h-10 rounded-full bg-brand-50 text-brand-800 flex items-center justify-center hover:bg-brand-800 hover:text-white transition-colors">
+                            <i class="ph ph-plus text-lg"></i>
+                        </button>
+                    </div>
+                    <div class="h-40 bg-gradient-to-br from-brand-50 to-brand-100 rounded-2xl mb-8 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                        <i class="ph ph-drop text-5xl text-brand-800/30"></i>
+                    </div>
+                    <div class="space-y-4">
+                        <span class="text-xs font-semibold tracking-wider text-brand-500 uppercase">Cuidado Corporal</span>
+                        <h3 class="font-display text-2xl text-brand-900">Óleo Revitalizante</h3>
+                        <p class="text-brand-900/60 font-light text-sm line-clamp-2">Una mezcla de aceites de jojoba y almendras dulces con toques de bergamota.</p>
+                        <div class="pt-4 flex items-center justify-between border-t border-brand-100">
+                            <span class="text-lg font-medium text-brand-900">$85.000 COP</span>
+                            <span class="text-sm text-brand-800 font-medium cursor-pointer hover:underline">Ver detalles</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Producto 2 -->
+                <div class="gsap-product product-card bg-brand-800 rounded-3xl p-8 border border-brand-800 relative overflow-hidden group text-white">
+                    <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white hover:text-brand-800 transition-colors">
+                            <i class="ph ph-plus text-lg"></i>
+                        </button>
+                    </div>
+                    <div class="absolute -right-10 -top-10 text-9xl text-white/5 font-display italic pointer-events-none">Bestseller</div>
+                    <div class="h-40 bg-white/5 rounded-2xl mb-8 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                        <i class="ph ph-sparkle text-5xl text-white/30"></i>
+                    </div>
+                    <div class="space-y-4 relative z-10">
+                        <span class="text-xs font-semibold tracking-wider text-brand-500 uppercase">Ritual de Sueño</span>
+                        <h3 class="font-display text-2xl">Bruma de Lavanda</h3>
+                        <p class="text-white/70 font-light text-sm line-clamp-2">Rocía sobre tu almohada para un descanso profundo y reparador.</p>
+                        <div class="pt-4 flex items-center justify-between border-t border-white/10">
+                            <span class="text-lg font-medium">$60.000 COP</span>
+                            <span class="text-sm text-brand-200 font-medium cursor-pointer hover:underline">Ver detalles</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Producto 3 -->
+                <div class="gsap-product product-card bg-white rounded-3xl p-8 border border-brand-200/30 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button class="w-10 h-10 rounded-full bg-brand-50 text-brand-800 flex items-center justify-center hover:bg-brand-800 hover:text-white transition-colors">
+                            <i class="ph ph-plus text-lg"></i>
+                        </button>
+                    </div>
+                    <div class="h-40 bg-gradient-to-br from-brand-50 to-brand-100 rounded-2xl mb-8 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                        <i class="ph ph-magic-wand text-5xl text-brand-800/30"></i>
+                    </div>
+                    <div class="space-y-4">
+                        <span class="text-xs font-semibold tracking-wider text-brand-500 uppercase">Purificación</span>
+                        <h3 class="font-display text-2xl">Exfoliante de Café</h3>
+                        <p class="text-brand-900/60 font-light text-sm line-clamp-2">Renueva tu piel estimulando la circulación con granos de café orgánico.</p>
+                        <div class="pt-4 flex items-center justify-between border-t border-brand-100">
+                            <span class="text-lg font-medium text-brand-900">$75.000 COP</span>
+                            <span class="text-sm text-brand-800 font-medium cursor-pointer hover:underline">Ver detalles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Oráculo IA Section -->
+    <section id="oraculo-section" class="py-32 relative overflow-hidden bg-brand-900 text-white">
+        <div class="absolute inset-0 z-0 opacity-20">
+            <div class="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-500/40 via-transparent to-transparent"></div>
+        </div>
         
-        <!-- Paso 1 -->
-        <div id="step1">
-            <div class="chat-msg msg-ai">Hola! Soy tu asistente botanico. Para crear tu rutina perfecta de hoy, cuentame: Que buscas armonizar?</div>
-            <div class="chat-options">
-                <button class="opt-btn" onclick="nextStep(2)">Mi Piel (Corporal)</button>
-                <button class="opt-btn" onclick="nextStep(2)">Mi Espacio (Hogar)</button>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 gsap-fade-up">
+                <i class="ph-fill ph-sparkle text-4xl text-brand-500 mb-6 inline-block"></i>
+                <h2 class="font-display text-4xl md:text-5xl font-light mb-6">El Oráculo <span class="italic text-brand-500">Botánico</span></h2>
+                <p class="text-lg text-white/60 font-light max-w-2xl mx-auto">Deja que nuestra inteligencia artificial guíe tu intuición hacia el ritual perfecto para tu estado actual.</p>
+            </div>
+
+            <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 shadow-2xl">
+                <!-- Chat Window -->
+                <div id="ai-chat-container" class="min-h-[300px] flex flex-col justify-center">
+                    
+                    <!-- Step 1 -->
+                    <div id="ai-step-1" class="space-y-8 animate-fade-in">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0">
+                                <i class="ph-fill ph-plant text-brand-500"></i>
+                            </div>
+                            <div class="bg-white/10 rounded-2xl rounded-tl-none p-5 text-white/90 font-light leading-relaxed">
+                                Hola. Siento tu presencia. Para crear tu alquimia de hoy, dime: ¿Hacia dónde quieres dirigir la energía?
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-4 pl-14">
+                            <button onclick="aiNextStep(2)" class="px-6 py-3 rounded-full border border-brand-500/50 text-brand-200 hover:bg-brand-500 hover:text-brand-900 hover:border-brand-500 transition-all duration-300 text-sm font-medium">Hacia mi cuerpo físico</button>
+                            <button onclick="aiNextStep(2)" class="px-6 py-3 rounded-full border border-brand-500/50 text-brand-200 hover:bg-brand-500 hover:text-brand-900 hover:border-brand-500 transition-all duration-300 text-sm font-medium">Hacia mi espacio y mente</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div id="ai-step-2" class="space-y-8 hidden">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-full bg-brand-500/20 flex items-center justify-center shrink-0">
+                                <i class="ph-fill ph-plant text-brand-500"></i>
+                            </div>
+                            <div class="bg-white/10 rounded-2xl rounded-tl-none p-5 text-white/90 font-light leading-relaxed">
+                                El enfoque está claro. Ahora, cierra los ojos un segundo. ¿Qué sensación anhelas manifestar?
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-4 pl-14">
+                            <button onclick="showAIResult()" class="px-6 py-3 rounded-full border border-brand-500/50 text-brand-200 hover:bg-brand-500 hover:text-brand-900 hover:border-brand-500 transition-all duration-300 text-sm font-medium">Calma y nutrición profunda</button>
+                            <button onclick="showAIResult()" class="px-6 py-3 rounded-full border border-brand-500/50 text-brand-200 hover:bg-brand-500 hover:text-brand-900 hover:border-brand-500 transition-all duration-300 text-sm font-medium">Despertar y vitalidad</button>
+                        </div>
+                    </div>
+
+                    <!-- Result -->
+                    <div id="ai-result" class="hidden">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-brand-500/20 text-brand-500 mb-6">
+                                <i class="ph ph-magic-wand text-4xl"></i>
+                            </div>
+                            <h3 class="font-display text-2xl md:text-3xl mb-2 text-white">Tu Ritual Asignado</h3>
+                            <p class="text-white/60 font-light mb-8">El universo y nuestra IA han elegido para ti:</p>
+                            
+                            <div class="bg-white text-brand-900 rounded-2xl p-6 md:p-8 max-w-md mx-auto text-left shadow-2xl">
+                                <span class="text-xs font-semibold tracking-wider text-brand-800 uppercase mb-2 block">Dúo Perfecto</span>
+                                <h4 class="font-display text-2xl mb-1">Set Renacer</h4>
+                                <p class="text-brand-900/60 text-sm mb-6 line-clamp-2">Óleo Revitalizante + Exfoliante de Café. La combinación exacta para despertar tus sentidos.</p>
+                                
+                                <div class="flex items-center justify-between mb-6">
+                                    <span class="text-2xl font-medium">$140.000 COP</span>
+                                    <span class="text-xs bg-brand-100 text-brand-800 px-3 py-1 rounded-full font-medium">-10% Off Bundle</span>
+                                </div>
+
+                                <button onclick="alert('Demo: Aquí se integraría el checkout de Wompi/Nequi en 1-click.')" class="w-full bg-brand-900 text-white rounded-xl py-4 font-medium hover:bg-brand-800 transition-colors shadow-lg shadow-brand-900/20 flex justify-center items-center gap-2">
+                                    Comprar Ahora 
+                                    <i class="ph-bold ph-arrow-right"></i>
+                                </button>
+                                <p class="text-center text-xs text-brand-900/40 mt-4 flex items-center justify-center gap-1">
+                                    <i class="ph-fill ph-lock-key"></i> Pagos seguros vía Nequi / Wompi
+                                </p>
+                            </div>
+                            
+                            <button onclick="resetAI()" class="mt-8 text-sm text-brand-500 hover:text-white transition-colors underline underline-offset-4">Volver a consultar</button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
+    </section>
 
-        <!-- Paso 2 -->
-        <div id="step2" style="display:none;">
-            <div class="chat-msg msg-ai">Perfecto. Selecciona la sensacion que tu cuerpo necesita en este momento:</div>
-            <div class="chat-options">
-                <button class="opt-btn" onclick="showProduct()">Hidratacion Profunda</button>
-                <button class="opt-btn" onclick="showProduct()">Energia y Exfoliacion</button>
+    <!-- Footer -->
+    <footer class="bg-brand-50 border-t border-brand-200/50 py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <a href="#" class="font-display font-medium text-2xl tracking-wide text-brand-900">
+                    Flor Dorada<span class="text-brand-500">.</span>
+                </a>
+                <p class="text-brand-900/50 text-sm mt-2">© 2026 Todos los derechos reservados.</p>
+            </div>
+            <div class="flex gap-6">
+                <a href="#" class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-900/70 hover:bg-brand-800 hover:text-white transition-colors">
+                    <i class="ph-fill ph-instagram-logo text-xl"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-900/70 hover:bg-brand-800 hover:text-white transition-colors">
+                    <i class="ph-fill ph-tiktok-logo text-xl"></i>
+                </a>
             </div>
         </div>
+    </footer>
 
-        <!-- Producto Recomendado -->
-        <div id="productResult" class="product-card">
-            <img src="https://images.unsplash.com/photo-1608248593842-8021c6a1f8cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Aceite">
-            <h4>Ritual de Hidratacion (Bundle)</h4>
-            <p style="font-size: 0.8rem; color: #666; margin: 5px 0;">Aceite de Almendras + Manteca de Karite</p>
-            <p style="font-weight: bold; margin-bottom: 10px;">$120.000 COP</p>
-            
-            <!-- Simulacion Checkout Rapido -->
-            <button class="checkout-btn" onclick="alert('Demo: Aqui se abre el modal rapido de Wompi/Nequi para pago en 1-click sin salir de la pagina.')">Comprar Ahora (1-Click)</button>
-            <span class="wompi-badge">Pago seguro via Nequi / Wompi / Tarjeta</span>
-        </div>
-    </div>
-
-    <!-- LOGICA DE INTERACCION -->
+    <!-- Scripts de Interacción y Animación -->
     <script>
-        const chatWindow = document.getElementById('oracleChat');
-        
-        function toggleOracle() {
-            chatWindow.classList.toggle('active');
+        // Lógica del Oráculo IA
+        function aiNextStep(step) {
+            document.getElementById('ai-step-1').classList.add('hidden');
+            const next = document.getElementById('ai-step-' + step);
+            next.classList.remove('hidden');
+            // Pequeña animación de entrada manual
+            gsap.fromTo(next, {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.5});
         }
 
-        function openOracle() {
-            chatWindow.classList.add('active');
+        function showAIResult() {
+            document.getElementById('ai-step-2').classList.add('hidden');
+            const result = document.getElementById('ai-result');
+            result.classList.remove('hidden');
+            gsap.fromTo(result, {opacity: 0, scale: 0.95}, {opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.5)"});
         }
 
-        function nextStep(step) {
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step' + step).style.display = 'block';
+        function resetAI() {
+            document.getElementById('ai-result').classList.add('hidden');
+            const step1 = document.getElementById('ai-step-1');
+            step1.classList.remove('hidden');
+            gsap.fromTo(step1, {opacity: 0, x: -20}, {opacity: 1, x: 0, duration: 0.4});
         }
 
-        function showProduct() {
-            document.getElementById('step2').style.display = 'none';
-            document.getElementById('productResult').style.display = 'block';
-        }
+        // Animaciones con GSAP & ScrollTrigger
+        document.addEventListener("DOMContentLoaded", (event) => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Navbar Blur Effect on Scroll
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    nav.classList.add('shadow-sm');
+                } else {
+                    nav.classList.remove('shadow-sm');
+                }
+            });
+
+            // Animación Hero Inicial
+            gsap.from(".gsap-hero", {
+                y: 40,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.15,
+                ease: "power3.out",
+                delay: 0.2
+            });
+
+            // Animaciones de Scroll Genéricas
+            gsap.utils.toArray('.gsap-fade-up').forEach(element => {
+                gsap.from(element, {
+                    scrollTrigger: {
+                        trigger: element,
+                        start: "top 85%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 50,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: "power2.out"
+                });
+            });
+
+            gsap.utils.toArray('.gsap-fade-right').forEach(element => {
+                gsap.from(element, {
+                    scrollTrigger: {
+                        trigger: element,
+                        start: "top 80%",
+                    },
+                    x: -50,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                });
+            });
+
+            gsap.utils.toArray('.gsap-fade-left').forEach(element => {
+                gsap.from(element, {
+                    scrollTrigger: {
+                        trigger: element,
+                        start: "top 80%",
+                    },
+                    x: 50,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                });
+            });
+
+            // Stagger para productos
+            gsap.from('.gsap-product', {
+                scrollTrigger: {
+                    trigger: "#productos",
+                    start: "top 70%"
+                },
+                y: 60,
+                opacity: 0,
+                duration: 0.8,
+                stagger: 0.15,
+                ease: "back.out(1.2)"
+            });
+        });
     </script>
 </body>
 </html>
