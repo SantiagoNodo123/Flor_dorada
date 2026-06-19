@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flor Dorada | Demo 2026</title>
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-color: #fcfbf9;
+            --text-main: #2c2a29;
+            --accent-green: #5c715e;
+            --accent-gold: #d4af37;
+            --surface: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* --- ANIMACIONES CSS (Efecto Scroll) --- */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+        }
+        .delay-1 { animation-delay: 0.3s; }
+        .delay-2 { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(to bottom, #eae4d3, var(--bg-color));
+            padding: 20px;
+        }
+        .hero h1 { font-size: 3.5rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 15px; }
+        .hero p { font-size: 1.2rem; color: #666; margin-bottom: 40px; max-width: 600px; }
+        .btn {
+            background-color: var(--accent-green); color: white; padding: 15px 35px; border: none; border-radius: 30px; font-size: 1rem; cursor: pointer; transition: 0.3s;
+        }
+        .btn:hover { background-color: #4a5c4b; transform: scale(1.05); }
+
+        /* --- ORACULO IA (Chat Flotante) --- */
+        .oracle-btn {
+            position: fixed; bottom: 30px; right: 30px; background: var(--accent-gold); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); z-index: 100; transition: 0.3s;
+        }
+        .oracle-btn:hover { transform: scale(1.1); }
+
+        .chat-window {
+            position: fixed; bottom: 100px; right: 30px; width: 350px; background: var(--surface); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 20px; display: none; z-index: 100; opacity: 0; transform: translateY(20px); transition: all 0.4s ease;
+        }
+        .chat-window.active { display: block; opacity: 1; transform: translateY(0); }
+        .chat-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; font-weight: bold; color: var(--accent-green); }
+        
+        .chat-msg { margin-bottom: 15px; font-size: 0.95rem; }
+        .msg-ai { background: #f0f4f1; padding: 12px; border-radius: 0 15px 15px 15px; }
+        
+        .chat-options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .opt-btn { background: white; border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .opt-btn:hover { background: var(--accent-green); color: white; }
+
+        /* --- PRODUCTO RECOMENDADO & CHECKOUT ZERO FRICTION --- */
+        .product-card { display: none; margin-top: 15px; border: 1px solid #eee; border-radius: 10px; padding: 15px; text-align: center; }
+        .product-card img { width: 100px; height: 100px; background: #eae4d3; border-radius: 50%; margin-bottom: 10px; object-fit: cover;}
+        
+        .checkout-btn { width: 100%; background: #111; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .checkout-btn:hover { background: #333; }
+        .wompi-badge { font-size: 0.7rem; color: #888; margin-top: 5px; display: block; }
+
+    </style>
+</head>
+<body>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <h1 class="fade-in">Flor Dorada</h1>
+        <p class="fade-in delay-1">Rituales botanicos para tu cuerpo y tu santuario. Descubre lo que la naturaleza tiene para ti hoy.</p>
+        <button class="btn fade-in delay-2" onclick="openOracle()">Descubrir Mi Rutina</button>
+    </section>
+
+    <!-- ORACLE BUTTON -->
+    <div class="oracle-btn" onclick="toggleOracle()">&#10024;</div>
+
+    <!-- ORACLE CHAT WINDOW -->
+    <div class="chat-window" id="oracleChat">
+        <div class="chat-header">Oraculo de Bienestar IA</div>
+        
+        <!-- Paso 1 -->
+        <div id="step1">
+            <div class="chat-msg msg-ai">Hola! Soy tu asistente botanico. Para crear tu rutina perfecta de hoy, cuentame: Que buscas armonizar?</div>
+            <div class="chat-options">
+                <button class="opt-btn" onclick="nextStep(2)">Mi Piel (Corporal)</button>
+                <button class="opt-btn" onclick="nextStep(2)">Mi Espacio (Hogar)</button>
+            </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div id="step2" style="display:none;">
+            <div class="chat-msg msg-ai">Perfecto. Selecciona la sensacion que tu cuerpo necesita en este momento:</div>
+            <div class="chat-options">
+                <button class="opt-btn" onclick="showProduct()">Hidratacion Profunda</button>
+                <button class="opt-btn" onclick="showProduct()">Energia y Exfoliacion</button>
+            </div>
+        </div>
+
+        <!-- Producto Recomendado -->
+        <div id="productResult" class="product-card">
+            <img src="https://images.unsplash.com/photo-1608248593842-8021c6a1f8cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Aceite">
+            <h4>Ritual de Hidratacion (Bundle)</h4>
+            <p style="font-size: 0.8rem; color: #666; margin: 5px 0;">Aceite de Almendras + Manteca de Karite</p>
+            <p style="font-weight: bold; margin-bottom: 10px;">$120.000 COP</p>
+            
+            <!-- Simulacion Checkout Rapido -->
+            <button class="checkout-btn" onclick="alert('Demo: Aqui se abre el modal rapido de Wompi/Nequi para pago en 1-click sin salir de la pagina.')">Comprar Ahora (1-Click)</button>
+            <span class="wompi-badge">Pago seguro via Nequi / Wompi / Tarjeta</span>
+        </div>
+    </div>
+
+    <!-- LOGICA DE INTERACCION -->
+    <script>
+        const chatWindow = document.getElementById('oracleChat');
+        
+        function toggleOracle() {
+            chatWindow.classList.toggle('active');
+        }
+
+        function openOracle() {
+            chatWindow.classList.add('active');
+        }
+
+        function nextStep(step) {
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step' + step).style.display = 'block';
+        }
+
+        function showProduct() {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('productResult').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
